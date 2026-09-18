@@ -14,11 +14,11 @@ from pathlib import Path
 import pytest
 
 import decisionrl
+import decisionrl.evolution
 from decisionrl.core.agent import BaseAgent
 from decisionrl.core.env import Env
 from decisionrl.envs import APPLIED_ENVIRONMENTS
 from decisionrl.envs.gym import GymAdapter
-import decisionrl.evolution
 
 _ROOT = Path(__file__).resolve().parents[1]
 
