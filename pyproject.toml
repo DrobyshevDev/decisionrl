@@ -42,7 +42,7 @@ classifiers = [
 # to do it. Everything that trains imports torch on first use and says so if it is
 # missing -- see decisionrl/_lazy.py. Install `decisionrl[torch]` for the deep-RL half.
 dependencies = [
-    "numpy>=1.21",
+    "numpy>=2.2.6",
 ]
 
 [project.optional-dependencies]
