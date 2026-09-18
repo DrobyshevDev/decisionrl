@@ -7,18 +7,18 @@
 Reinforcement learning for operational decisions.
 
 [![CI](https://github.com/DrobyshevDev/decisionrl/actions/workflows/ci.yml/badge.svg)](https://github.com/DrobyshevDev/decisionrl/actions/workflows/ci.yml)
+[![Applied claims re-verified nightly](https://github.com/DrobyshevDev/decisionrl/actions/workflows/verify.yml/badge.svg)](https://github.com/DrobyshevDev/decisionrl/actions/workflows/verify.yml)
+[![Coverage](https://codecov.io/gh/DrobyshevDev/decisionrl/branch/main/graph/badge.svg)](https://codecov.io/gh/DrobyshevDev/decisionrl)
 [![PyPI](https://img.shields.io/pypi/v/decisionrl.svg)](https://pypi.org/project/decisionrl/)
+[![Python](https://img.shields.io/pypi/pyversions/decisionrl.svg)](https://pypi.org/project/decisionrl/)
+[![License](https://img.shields.io/pypi/l/decisionrl.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-mkdocs--material-blue.svg)](https://drobyshevdev.github.io/decisionrl/)
-[![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+[![Algorithms](https://img.shields.io/badge/algorithms-32-8A2BE2.svg)](docs/algorithms.md)
+[![Environments](https://img.shields.io/badge/environments-24%20(9%20applied)-2ea043.svg)](docs/environments.md)
+[![Optimizers](https://img.shields.io/badge/gradient--free%20optimizers-12-9333ea.svg)](docs/evolution.md)
 [![Code style: ruff](https://img.shields.io/badge/lint-ruff-orange.svg)](https://github.com/astral-sh/ruff)
 [![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue.svg)](https://mypy-lang.org/)
-
-[![Algorithms](https://img.shields.io/badge/algorithms-31-8A2BE2.svg)](docs/algorithms.md)
-[![Environments](https://img.shields.io/badge/environments-22%20(9%20applied)-2ea043.svg)](docs/environments.md)
-[![Optimizers](https://img.shields.io/badge/gradient--free%20optimizers-12-9333ea.svg)](docs/evolution.md)
-[![Tests](https://img.shields.io/badge/tests-400-brightgreen.svg)](tests)
-[![Coverage](https://img.shields.io/badge/coverage-86%25-brightgreen.svg)](tests)
 [![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org)
 
 </div>

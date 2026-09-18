@@ -1,0 +1,27 @@
+# Codecov replaces a hand-written badge with a figure recomputed on every run.
+#
+# Both statuses are informational to begin with: they report the change and
+# never fail a branch. That is deliberate — a gate nobody chose the number for
+# is a gate people learn to override. The real floor lives in pyproject.toml,
+# where `pytest --cov` enforces it identically on a laptop and in CI. Turn
+# `informational` off here once the measured figure has settled.
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+        informational: true
+    patch:
+      default:
+        target: 80%
+        informational: true
+
+# No comment on every pull request: the status check already says what changed.
+comment: false
+
+ignore:
+  - "tests/**"
+  - "examples/**"
+  - "docs/**"
+  - "scripts/**"

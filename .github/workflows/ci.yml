@@ -40,7 +40,18 @@ jobs:
       - name: Mypy
         run: mypy
       - name: Fast tests
-        run: pytest -m "not slow" -q --cov=decisionrl --cov-report=term-missing
+        run: pytest -m "not slow" -q --cov=decisionrl --cov-report=term-missing --cov-report=xml
+      # One upload, from one interpreter. Five racing uploads would leave
+      # Codecov reporting whichever landed last, which is not a number anyone
+      # chose. The upload fails the job only once the token exists, so adding
+      # the secret is what turns this from decoration into a check.
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: ${{ secrets.CODECOV_TOKEN != '' }}
 
   learning-tests:
     name: learning / integration tests

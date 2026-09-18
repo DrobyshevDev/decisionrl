@@ -18,6 +18,7 @@ from decisionrl.core.agent import BaseAgent
 from decisionrl.core.env import Env
 from decisionrl.envs import APPLIED_ENVIRONMENTS
 from decisionrl.envs.gym import GymAdapter
+import decisionrl.evolution
 
 _ROOT = Path(__file__).resolve().parents[1]
 
@@ -49,6 +50,7 @@ ALGORITHMS = len(_exported(decisionrl, BaseAgent))
 # Gymnasium installed and an environment id to wrap.
 ENVIRONMENTS = len(_exported(decisionrl.envs, Env, exclude=(GymAdapter,)))
 APPLIED = len(APPLIED_ENVIRONMENTS)
+OPTIMIZERS = len(decisionrl.evolution.OPTIMIZERS)
 
 
 def test_counts_are_what_we_think_they_are():
@@ -89,3 +91,36 @@ def test_readme_quotes_the_real_algorithm_count():
     quoted = [int(n) for n in re.findall(r"(\d+) algorithms", readme)]
     assert quoted, "README no longer states an algorithm count"
     assert set(quoted) == {ALGORITHMS}, quoted
+
+
+def _badge(readme, label):
+    """The number a shields.io badge displays, by its label."""
+    match = re.search(rf"img\.shields\.io/badge/{label}-(\d+)", readme)
+    assert match, f"README has no {label} badge in the expected form"
+    return int(match.group(1))
+
+
+def test_readme_badges_quote_the_real_counts():
+    """The badges drifted exactly where the prose did not.
+
+    `test_readme_quotes_the_real_algorithm_count` matches "32 algorithms" and
+    stayed green for weeks while the badge three lines above it read 31 and the
+    environment badge read 22 — because a badge spells the figure
+    `algorithms-32`, which that regex never sees. A reader sees the badge first.
+    Both forms answer to the same source now.
+    """
+    readme = _read("README.md")
+    assert _badge(readme, "algorithms") == ALGORITHMS
+    assert _badge(readme, "gradient--free%20optimizers") == OPTIMIZERS
+
+    match = re.search(r"img\.shields\.io/badge/environments-(\d+)%20\((\d+)%20applied\)", readme)
+    assert match, "README has no environments badge in the expected form"
+    assert tuple(int(g) for g in match.groups()) == (ENVIRONMENTS, APPLIED)
+
+
+def test_zenodo_metadata_quotes_the_real_counts():
+    """The archived record outlives the README, so it has to be right too."""
+    zenodo = _read(".zenodo.json")
+    match = re.search(r"(\d+) algorithms and (\d+) environments, (\d+) of them applied", zenodo)
+    assert match, ".zenodo.json no longer states the counts in the expected form"
+    assert tuple(int(g) for g in match.groups()) == (ALGORITHMS, ENVIRONMENTS, APPLIED)
