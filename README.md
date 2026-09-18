@@ -9,6 +9,7 @@ Reinforcement learning for operational decisions.
 [![CI](https://github.com/DrobyshevDev/decisionrl/actions/workflows/ci.yml/badge.svg)](https://github.com/DrobyshevDev/decisionrl/actions/workflows/ci.yml)
 [![Applied claims re-verified nightly](https://github.com/DrobyshevDev/decisionrl/actions/workflows/verify.yml/badge.svg)](https://github.com/DrobyshevDev/decisionrl/actions/workflows/verify.yml)
 [![Coverage](https://codecov.io/gh/DrobyshevDev/decisionrl/branch/main/graph/badge.svg)](https://codecov.io/gh/DrobyshevDev/decisionrl)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/DrobyshevDev/decisionrl/badge)](https://scorecard.dev/viewer/?uri=github.com/DrobyshevDev/decisionrl)
 [![PyPI](https://img.shields.io/pypi/v/decisionrl.svg)](https://pypi.org/project/decisionrl/)
 [![Python](https://img.shields.io/pypi/pyversions/decisionrl.svg)](https://pypi.org/project/decisionrl/)
 [![License](https://img.shields.io/pypi/l/decisionrl.svg)](LICENSE)
