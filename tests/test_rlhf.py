@@ -13,7 +13,26 @@ from decisionrl.rlhf import (
 )
 
 
-def _random_policy(env):
+def _random_policy(env, seed: int = 0):
+    """A random policy whose actions are the same on every run.
+
+    `set_seed` in conftest seeds `random`, `numpy`'s legacy global state and
+    torch. It cannot seed a space: `Space.__init__` builds its own
+    `np.random.default_rng()` with no seed, so `action_space.sample()` draws
+    from OS entropy and every run collects different segments. Passing
+    `seed=` to `collect_segments` does not help either -- that reaches
+    `env.reset(seed=...)`, which is a different generator.
+
+    The effect is not subtle. Three runs of `test_dpo_learns_preferences` at
+    one thread gave accuracies of 0.9138, 0.9188 and 0.9206 before this line
+    and 0.914375 three times after it. The assertion threshold is 0.8, so the
+    spread usually clears it and occasionally does not -- which is the flake
+    reported in #15.
+
+    `test_scenarios.py::test_env_seeding_is_deterministic` already does this;
+    it is a test about determinism, so it had to.
+    """
+    env.action_space.seed(seed)
     return lambda o: env.action_space.sample()
 
 
