@@ -38,5 +38,16 @@ def test_recurrent_ppo_learns_cartpole(quiet_logger):
     agent = RecurrentPPO(venv, n_steps=128, n_epochs=6, n_minibatches=4, ent_coef=0.0,
                          learning_rate=1e-3, seed=0, logger=quiet_logger)
     agent.learn(25_000)
-    mean = evaluate_policy(agent, CartPole(), n_episodes=20)[0]
+    # `seed=` on the evaluation, not just on the agent. CartPole builds its own
+    # `np.random.default_rng()` with no seed, and `reset(seed=None)` leaves it
+    # alone, so an unseeded evaluation starts all twenty episodes from states
+    # drawn out of OS entropy. Training here is reproducible -- three full runs
+    # on one machine gave a bit-identical parameter checksum -- and the measurement
+    # taken afterwards was not: 121.30, 122.50 and 119.05 for the same weights,
+    # against 120.25 three times with this seed.
+    #
+    # That is a few points of noise, not the collapse to random-policy level
+    # reported in #15, so this does not close that. It removes the one source
+    # of variance that is ours.
+    mean = evaluate_policy(agent, CartPole(), n_episodes=20, seed=12345)[0]
     assert mean > 60, f"RecurrentPPO failed to learn CartPole (mean_return={mean:.1f})"
