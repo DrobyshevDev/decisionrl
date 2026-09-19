@@ -18,8 +18,8 @@ jobs:
       attestations: write   # build provenance for the built distributions
       contents: write       # attach those distributions to the release
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: "3.11"
       - name: Build sdist and wheel
@@ -27,7 +27,7 @@ jobs:
           python -m pip install --upgrade pip build
           python -m build
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
 
       # The GitHub Release carried no files at all: the tag pointed at a commit
       # and the artifacts lived only on PyPI. Someone checking what was actually
@@ -43,7 +43,7 @@ jobs:
       # PyPI-side PEP 740 attestations are unchanged: gh-action-pypi-publish
       # produces those by default under Trusted Publishing.
       - name: Attest the build provenance
-        uses: actions/attest-build-provenance@v4
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4
         with:
           subject-path: "dist/*"
 
