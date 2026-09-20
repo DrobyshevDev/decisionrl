@@ -6,6 +6,22 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- `NormalizeObservation` and `NormalizeReward` gained `set_training(bool)`. Called with
+  `False` before evaluation, the observation wrapper freezes its running statistics (the
+  policy sees observations normalized the way it was trained, not statistics that drift
+  toward the evaluation distribution) and the reward wrapper stops scaling and passes the
+  environment's original rewards through, so evaluation reports true returns. This matches
+  the freeze semantics of Stable-Baselines3's `VecNormalize`.
+
+### Fixed
+- The on-policy rollout buffer shuffled its minibatches with the global NumPy RNG. Two
+  on-policy agents seeded differently in the same process therefore drew from one shared
+  shuffle stream and perturbed each other, and the buffer never held the per-instance RNG
+  the README credits every buffer with. It now owns a `numpy.random.Generator` seeded from
+  the agent's seed (threaded through the on-policy base and IPPO), so PPO and the other
+  on-policy agents are reproducible per seed and independent of global RNG state.
+
 ### Changed
 - The top-level package now resolves its public names lazily (PEP 562 `__getattr__`),
   so `import decisionrl` imports nothing on its own. `decisionrl.envs`,
