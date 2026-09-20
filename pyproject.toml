@@ -81,6 +81,8 @@ decisionrl = "decisionrl.cli:main"
 
 [project.urls]
 Homepage = "https://github.com/DrobyshevDev/decisionrl"
+Documentation = "https://drobyshevdev.github.io/decisionrl/"
+Changelog = "https://github.com/DrobyshevDev/decisionrl/blob/main/CHANGELOG.md"
 Repository = "https://github.com/DrobyshevDev/decisionrl"
 Issues = "https://github.com/DrobyshevDev/decisionrl/issues"
 
@@ -171,3 +173,23 @@ ignore_missing_imports = true
 module = ["huggingface_hub", "huggingface_hub.*", "bokeh", "bokeh.*"]
 follow_imports = "skip"
 ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["decisionrl"]
+branch = true
+
+[tool.coverage.report]
+# A floor, not the measured figure. The README used to carry a hand-written
+# "86%" badge that nothing recomputed, which is the exact failure this project
+# says it does not tolerate: a number in prose with nothing behind it. The badge
+# is now generated from the run. Raise this floor to the measured value once the
+# first report lands, and it ratchets from there.
+fail_under = 80
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
