@@ -58,7 +58,12 @@ class BC(BaseAgent):
               log_interval: int = 0) -> dict:
         losses: deque = deque(maxlen=100)
         for it in range(n_iters):
-            batch = dataset.sample(batch_size)
+            # .to(self.device), as CQL, IQL, TD3BC and DiffusionPolicy all do.
+            # `device="auto"` puts the actor on a GPU when there is one, while
+            # TransitionDataset defaults to "cpu" and collect_expert_dataset
+            # never passes anything else -- so without this the documented way
+            # of using BC raises on the first batch of any machine with a GPU.
+            batch = dataset.sample(batch_size).to(self.device)
             dist = self.actor(batch.obs)
             if self.discrete:
                 loss = F.cross_entropy(dist.logits, batch.actions.long())
@@ -208,8 +213,12 @@ class GAIL:
                                 np.zeros(len(pol_obs)), device=str(self.device))
         losses = []
         for _ in range(epochs):
-            e = self.expert.sample(batch_size)
-            p = pol.sample(batch_size)
+            # The expert dataset comes from the caller and is on whatever
+            # device they built it on, usually the CPU; `pol` is built on
+            # self.device just above. Both are moved, so the discriminator
+            # never has to care which of its two inputs came from where.
+            e = self.expert.sample(batch_size).to(self.device)
+            p = pol.sample(batch_size).to(self.device)
             e_logits = self.discriminator.logits(e.obs, e.actions)
             p_logits = self.discriminator.logits(p.obs, p.actions)
             loss = F.binary_cross_entropy_with_logits(e_logits, torch.ones_like(e_logits)) + \

@@ -19,6 +19,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the freeze semantics of Stable-Baselines3's `VecNormalize`.
 
 ### Fixed
+- `BC` and `GAIL` raised on any machine with a GPU. Both take `device="auto"`, which puts
+  the network on CUDA when there is one, while `TransitionDataset` defaults to `"cpu"` and
+  `collect_expert_dataset` never passes anything else — so the documented way of using them
+  failed on the first batch with "Expected all tensors to be on the same device". CQL, IQL,
+  TD3BC and DiffusionPolicy already moved each batch with `ReplayBatch.to(self.device)`,
+  whose docstring describes this exact case; `decisionrl.imitation` was the one place that
+  did not. Three tests in `test_imitation.py` failed on every GPU machine and passed on
+  every CI runner, because the runners have no GPU.
 - The on-policy rollout buffer shuffled its minibatches with the global NumPy RNG. Two
   on-policy agents seeded differently in the same process therefore drew from one shared
   shuffle stream and perturbed each other, and the buffer never held the per-instance RNG
