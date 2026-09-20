@@ -1,0 +1,39 @@
+{
+  "upload_type": "software",
+  "title": "decisionrl — reinforcement learning for operational decisions",
+  "description": "A reinforcement learning library aimed at operational decisions with a cost function -- pricing, inventory, energy, queueing and supply chains -- rather than at benchmark scores. 32 algorithms and 24 environments, 9 of them applied. Every applied environment ships with the classical operations-research baseline beside it, so a learned policy is measured against the standard method rather than asserted to improve on it.",
+  "creators": [
+    {
+      "name": "Drobyshev, Denis",
+      "affiliation": "DrobyshevDev"
+    }
+  ],
+  "license": "mit",
+  "keywords": [
+    "reinforcement-learning",
+    "operations-research",
+    "inventory-management",
+    "dynamic-pricing",
+    "benchmarking",
+    "python"
+  ],
+  "access_right": "open",
+  "communities": [
+    {
+      "identifier": "drobyshevdev"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/DrobyshevDev/decisionrl",
+      "relation": "isSupplementTo",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://drobyshevdev.github.io/decisionrl/",
+      "relation": "isDocumentedBy",
+      "resource_type": "publication-softwaredocumentation"
+    }
+  ],
+  "language": "eng"
+}
