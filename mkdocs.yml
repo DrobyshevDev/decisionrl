@@ -46,6 +46,7 @@ nav:
   - AlphaZero: alphazero.md
   - Meta-RL (RL²): meta.md
   - Contextual bandits: bandits.md
+  - Off-policy evaluation: ope.md
   - Imitation learning: imitation.md
   - LLM alignment (RLHF): text.md
   - Evolution & swarm: evolution.md

@@ -334,6 +334,8 @@ correctly.
 - Contextual bandits for one-shot decisions such as pricing and recommendation: LinUCB,
   linear Thompson sampling, and an epsilon-greedy baseline, with exact regret tracking
   (`decisionrl.bandits`).
+- Off-policy evaluation of a new bandit policy from logged data, before deploying it: IPS,
+  self-normalized IPS, the direct method, and doubly robust (`decisionrl.ope`).
 - Preference-based RLHF and DPO on control tasks (`decisionrl.rlhf`).
 - RLHF on a character-level GPT (`decisionrl.text`): supervised pre-training, then
   reward fine-tuning with a KL penalty to the reference model.

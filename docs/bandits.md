@@ -58,3 +58,6 @@ Cumulative regret over 3000 rounds on a 6-arm, 8-feature problem, averaged over 
 The confidence-based methods explore where they are uncertain rather than uniformly, so
 their regret grows sublinearly and stays a small fraction of both epsilon-greedy and a
 random policy.
+
+To estimate what a new bandit policy would earn from a log of past decisions, before
+deploying it, see [off-policy evaluation](ope.md).
