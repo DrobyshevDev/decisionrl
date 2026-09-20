@@ -123,3 +123,8 @@ MiniGrid navigation envs, and `decisionrl.multiagent.make_pettingzoo(...)` (need
 
 `TimeLimit`, `NormalizeObservation`, `NormalizeReward`, `FrameStack`,
 `FlattenObservation`, `OneHotObservation`, `SyncVectorEnv`, `AsyncVectorEnv`.
+
+`NormalizeObservation` and `NormalizeReward` update their running statistics online while
+training. Call `set_training(False)` before evaluation to freeze them: observations are
+then normalized with the statistics learned during training, and reward normalization
+(a training aid) is switched off so evaluation reports the environment's true returns.

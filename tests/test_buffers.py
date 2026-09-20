@@ -196,6 +196,31 @@ def test_rollout_get_minibatches_cover_all():
     assert seen == 4 * 2  # every transition yielded exactly once
 
 
+def _rollout_shuffle_order(seed):
+    obs_space, act_space = Box(-1, 1, shape=(3,)), Discrete(2)
+    buf = RolloutBuffer(4, 2, obs_space, act_space, seed=seed)
+    tag = 0.0
+    for _ in range(4):
+        obs = np.zeros((2, 3), np.float32)
+        obs[:, 0] = [tag, tag + 1]  # a unique marker per (step, env)
+        tag += 2
+        buf.add(obs, np.zeros(2), np.zeros(2), np.zeros(2), np.zeros(2), np.zeros(2))
+    buf.compute_returns_and_advantages(np.zeros(2), np.zeros(2))
+    return [float(b.obs[0, 0]) for b in buf.get(batch_size=1)]
+
+
+def test_rollout_shuffle_is_seeded_and_isolated_from_global_rng():
+    # Same seed reproduces the minibatch order; a different global np.random state must
+    # not perturb it (the buffer owns its RNG); a different seed reorders it.
+    np.random.seed(0)
+    a = _rollout_shuffle_order(123)
+    np.random.seed(999)
+    b = _rollout_shuffle_order(123)
+    c = _rollout_shuffle_order(456)
+    assert a == b
+    assert a != c
+
+
 def test_sumtree_batch_update_matches_sequential():
     from decisionrl.buffers.prioritized import SumTree
 
