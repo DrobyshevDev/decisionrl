@@ -41,6 +41,33 @@ def test_normalize_reward_runs():
     assert all(np.isfinite(rewards))
 
 
+def test_normalize_observation_freezes_stats_in_eval():
+    env = NormalizeObservation(CartPole())
+    env.reset(seed=0)
+    for _ in range(20):
+        env.step(env.action_space.sample())
+    env.set_training(False)
+    frozen_mean, frozen_var = env.rms.mean.copy(), env.rms.var.copy()
+    env.reset(seed=1)
+    for _ in range(20):
+        _, _, term, trunc, _ = env.step(env.action_space.sample())
+        if term or trunc:
+            break
+    assert np.array_equal(env.rms.mean, frozen_mean)  # statistics no longer move
+    assert np.array_equal(env.rms.var, frozen_var)
+
+
+def test_normalize_reward_passes_raw_reward_in_eval():
+    env = NormalizeReward(CartPole(), gamma=0.99)
+    env.set_training(False)
+    env.reset(seed=0)
+    for _ in range(20):
+        _, r, term, trunc, _ = env.step(env.action_space.sample())
+        assert r == 1.0  # CartPole pays +1 per step; frozen wrapper returns it untouched
+        if term or trunc:
+            break
+
+
 def test_sync_vector_env_step_shapes():
     venv = SyncVectorEnv([lambda: CartPole() for _ in range(4)])
     assert venv.num_envs == 4

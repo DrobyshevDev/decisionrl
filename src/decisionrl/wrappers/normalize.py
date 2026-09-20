@@ -27,12 +27,23 @@ class NormalizeObservation(Wrapper):
         self.rms = RunningMeanStd(shape=self.observation_space.shape)
         self.epsilon = float(epsilon)
         self.clip = float(clip)
+        self.training = True
         low = np.full(self.observation_space.shape, -clip, dtype=np.float32)  # type: ignore[type-var]
         high = np.full(self.observation_space.shape, clip, dtype=np.float32)  # type: ignore[type-var]
         self.observation_space = Box(low, high, dtype=np.float32)
 
+    def set_training(self, training: bool = True) -> None:
+        """Freeze (``False``) or resume (``True``) updates to the running statistics.
+
+        Call ``set_training(False)`` before evaluation so the policy sees observations
+        normalized with the statistics learned during training, rather than statistics
+        that keep drifting toward the evaluation distribution.
+        """
+        self.training = bool(training)
+
     def _normalize(self, obs: np.ndarray) -> np.ndarray:
-        self.rms.update(obs[None])
+        if self.training:
+            self.rms.update(obs[None])
         out = (obs - self.rms.mean) / np.sqrt(self.rms.var + self.epsilon)
         return np.clip(out, -self.clip, self.clip).astype(np.float32)
 
@@ -59,7 +70,18 @@ class NormalizeReward(Wrapper):
         self.gamma = float(gamma)
         self.epsilon = float(epsilon)
         self.clip = float(clip)
+        self.training = True
         self._ret = 0.0
+
+    def set_training(self, training: bool = True) -> None:
+        """Freeze (``False``) or resume (``True``) reward normalization.
+
+        Reward scaling is a training aid, so with ``training=False`` the wrapper passes
+        the environment's original rewards through unchanged and stops updating its
+        statistics. Evaluate with it frozen (or on the unwrapped environment) to report
+        true returns rather than scaled ones.
+        """
+        self.training = bool(training)
 
     def reset(self, *, seed: Optional[int] = None, options: Optional[Dict] = None):
         self._ret = 0.0
@@ -67,6 +89,8 @@ class NormalizeReward(Wrapper):
 
     def step(self, action):
         obs, reward, terminated, truncated, info = self.env.step(action)
+        if not self.training:
+            return obs, reward, terminated, truncated, info
         self._ret = self._ret * self.gamma + reward
         self.rms.update(np.array([self._ret]))
         norm_reward = reward / np.sqrt(self.rms.var + self.epsilon)

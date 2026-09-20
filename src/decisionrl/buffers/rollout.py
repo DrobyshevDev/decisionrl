@@ -39,12 +39,16 @@ class RolloutBuffer:
         gamma: float = 0.99,
         gae_lambda: float = 0.95,
         device: str = "cpu",
+        seed: Optional[int] = None,
     ) -> None:
         self.n_steps = int(n_steps)
         self.num_envs = int(num_envs)
         self.gamma = float(gamma)
         self.gae_lambda = float(gae_lambda)
         self.device = torch.device(device)
+        # Own seeded RNG for minibatch shuffling, so two agents in one process with
+        # different seeds do not share (and perturb) a single global stream.
+        self.rng = np.random.default_rng(seed)
 
         self.discrete_actions = is_discrete(action_space)
         obs_shape = observation_space.shape if observation_space.shape is not None else ()
@@ -115,7 +119,7 @@ class RolloutBuffer:
         returns = self._flat(self.returns, torch.float32)
         values = self._flat(self.values, torch.float32)
 
-        indices = np.random.permutation(total)
+        indices = self.rng.permutation(total)
         for start in range(0, total, batch_size):
             idx = indices[start : start + batch_size]
             yield RolloutBatch(

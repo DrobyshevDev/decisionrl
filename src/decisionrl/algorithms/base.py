@@ -87,7 +87,7 @@ class OnPolicyAgent(BaseAgent):
         self.anneal_lr = bool(anneal_lr)
         self.buffer = RolloutBuffer(
             self.n_steps, self.num_envs, obs_space, act_space,
-            gamma=gamma, gae_lambda=gae_lambda, device=str(self.device),
+            gamma=gamma, gae_lambda=gae_lambda, device=str(self.device), seed=self.seed,
         )
         self._last_obs: Optional[np.ndarray] = None
         self._last_episode_starts = np.ones(self.num_envs, dtype=np.float32)

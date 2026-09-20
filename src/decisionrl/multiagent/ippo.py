@@ -111,13 +111,16 @@ class MultiAgentPPO:
         if self.shared_policy:
             self.actor, self.critic, self.optimizer = build()
             self.buffer = RolloutBuffer(self.n_steps, len(self.agents), obs_space, act_space,
-                                        gamma=gamma, gae_lambda=gae_lambda, device=str(self.device))
+                                        gamma=gamma, gae_lambda=gae_lambda, device=str(self.device),
+                                        seed=int(self.rng.integers(1 << 31)))
         else:
             self.actors, self.critics, self.optimizers, self.buffers = {}, {}, {}, {}
             for a in self.agents:
                 self.actors[a], self.critics[a], self.optimizers[a] = build()
                 self.buffers[a] = RolloutBuffer(self.n_steps, 1, obs_space, act_space,
-                                                gamma=gamma, gae_lambda=gae_lambda, device=str(self.device))
+                                                gamma=gamma, gae_lambda=gae_lambda,
+                                                device=str(self.device),
+                                                seed=int(self.rng.integers(1 << 31)))
         self.ep_return_buffer: dict = {a: deque(maxlen=100) for a in self.agents}
 
     def _nets(self, agent):
