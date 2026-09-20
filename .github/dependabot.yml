@@ -37,6 +37,24 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: gymnasium
         update-types: ["version-update:semver-major"]
+
+      # Dev tools that have dropped the oldest Python this project supports.
+      # mypy 2.3.1 requires >=3.11; CI tests 3.9, so raising the floor to it
+      # fails at install on that leg before a test runs. The floor cannot move
+      # until 3.9 is dropped, and that is a decision about the support matrix
+      # rather than about a linter.
+      #
+      # `update-types` does not help here: for a `>=` constraint Dependabot
+      # files a "requirement update", which that filter does not match.
+      - dependency-name: mypy
+
+      # Lower bounds on these describe what a user may already have installed,
+      # not what CI resolves - pip takes the newest match either way. Raising
+      # them locks people out and changes nothing that gets tested, so they
+      # move when the code needs a newer API, not on a schedule.
+      - dependency-name: tqdm
+      - dependency-name: onnx
+      - dependency-name: onnxruntime
     open-pull-requests-limit: 5
 
   - package-ecosystem: docker

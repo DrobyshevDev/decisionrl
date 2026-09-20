@@ -36,7 +36,7 @@ jobs:
       # from the branch is checked out or executed, which is what makes
       # pull_request_target safe to use here.
       - id: metadata
-        uses: dependabot/fetch-metadata@v3
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3
 
       - id: verdict
         name: Decide whether this one can merge itself
