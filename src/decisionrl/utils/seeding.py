@@ -14,6 +14,12 @@ __all__ = ["set_seed"]
 def set_seed(seed: Optional[int], deterministic: bool = False) -> Optional[int]:
     """Seed Python, NumPy and PyTorch RNGs.
 
+    Does **not** seed a :class:`~decisionrl.core.spaces.Space`. Each space owns
+    an ``np.random.default_rng()`` built without a seed, so ``space.sample()``
+    draws from OS entropy until ``space.seed()`` is called on that instance.
+    A test whose policy is ``env.action_space.sample()`` is not reproducible
+    because this function ran -- see the seeding in ``tests/test_rlhf.py``.
+
     Parameters
     ----------
     seed:
@@ -28,6 +34,11 @@ def set_seed(seed: Optional[int], deterministic: bool = False) -> Optional[int]:
 
     random.seed(seed)
     np.random.seed(seed)
+    # Only reaches processes started after this call. Hash randomisation is
+    # fixed when an interpreter starts, so assigning it here does nothing to the
+    # current one -- `PYTHONHASHSEED=0 python ...` is the only way to fix hashes
+    # in this process. Kept because worker processes spawned later do inherit
+    # it, and because removing it would quietly change that.
     os.environ["PYTHONHASHSEED"] = str(seed)
 
     try:
