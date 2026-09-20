@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- `decisionrl.ope`: off-policy evaluation for contextual bandits. Estimate what a target
+  policy would earn from a log of `(context, action, propensity, reward)`, without deploying
+  it, using inverse propensity scoring, self-normalized IPS, the direct method, or doubly
+  robust. Includes `collect_bandit_log` and behaviour-policy helpers. Pure NumPy, no torch.
 - `NormalizeObservation` and `NormalizeReward` gained `set_training(bool)`. Called with
   `False` before evaluation, the observation wrapper freezes its running statistics (the
   policy sees observations normalized the way it was trained, not statistics that drift
