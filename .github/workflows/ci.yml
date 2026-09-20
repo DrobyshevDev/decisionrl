@@ -40,6 +40,15 @@ jobs:
       - name: Mypy
         run: mypy
       - name: Fast tests
+        # Single-threaded torch, for the same reason the slow job does it: the
+        # ubuntu-latest fleet is heterogeneous, and float accumulation order in
+        # a CPU reduction depends on how many threads share it. Measured on one
+        # machine with one seed, DPO's training accuracy came out 0.9238 on one
+        # thread, 0.9288 on two, 0.9131 on four and 0.9419 on eight. The slow
+        # job pinned this and the fast job did not, which is where #15's flake
+        # was being blamed on the fleet.
+        env:
+          OMP_NUM_THREADS: "1"
         run: pytest -m "not slow" -q --cov=decisionrl --cov-report=term-missing --cov-report=xml
       # One upload, from one interpreter. Five racing uploads would leave
       # Codecov reporting whichever landed last, which is not a number anyone
