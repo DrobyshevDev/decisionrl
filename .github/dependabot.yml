@@ -32,11 +32,12 @@ updates:
       # The published results are measured on specific versions and re-verified
       # by examples/verify_applied_claims.py. These move when someone re-runs
       # that script, not because a scheduled PR was green.
+      # Unconditional, not update-types. For a `>=` constraint Dependabot files
+      # a "requirement update", which that filter does not match - numpy went
+      # from >=1.21 to >=2.2.6 in #29 straight past a semver-major ignore.
       - dependency-name: torch
       - dependency-name: numpy
-        update-types: ["version-update:semver-major"]
       - dependency-name: gymnasium
-        update-types: ["version-update:semver-major"]
 
       # Dev tools that have dropped the oldest Python this project supports.
       # mypy 2.3.1 requires >=3.11; CI tests 3.9, so raising the floor to it
@@ -47,6 +48,10 @@ updates:
       # `update-types` does not help here: for a `>=` constraint Dependabot
       # files a "requirement update", which that filter does not match.
       - dependency-name: mypy
+      # pytest 9 requires >=3.10, mypy 2.3 requires >=3.11. Both fail the 3.9
+      # leg at install. Ignored until the support matrix decides otherwise -
+      # see #30, which is about that decision rather than about these packages.
+      - dependency-name: pytest
 
       # Lower bounds on these describe what a user may already have installed,
       # not what CI resolves - pip takes the newest match either way. Raising
