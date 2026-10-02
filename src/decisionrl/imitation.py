@@ -195,6 +195,17 @@ class GAIL:
         self.policy = PPO(self.wrapped, learning_rate=learning_rate, n_steps=n_steps,
                           hidden_sizes=hidden_sizes, device=device, seed=seed, **ppo_kwargs)
         self.rng = np.random.default_rng(seed)
+        self.seed = seed
+        # The policy rollouts below draw their starting states from this env,
+        # and an env owns an `np.random.default_rng()` built without a seed --
+        # `set_seed` cannot reach it, as its own docstring says. Without this
+        # line every iteration of `learn` starts from OS entropy, so `seed=`
+        # names nothing: three fresh processes at seed 0 returned 421.70,
+        # 496.20 and 385.10 on one machine. Seeding here is enough for all of
+        # them: `reset()` keeps the generator it was given, so the unseeded
+        # resets that follow draw from a seeded stream.
+        if seed is not None:
+            self.env.reset(seed=seed)
 
     def _collect_policy_transitions(self, n: int):
         obs_l, act_l = [], []
@@ -209,8 +220,14 @@ class GAIL:
         return np.asarray(obs_l, dtype=np.float32), np.asarray(act_l)
 
     def _update_discriminator(self, pol_obs, pol_act, epochs, batch_size):
+        # Drawn from this agent's own generator rather than left unseeded: the
+        # dataset is rebuilt every iteration and samples its minibatch indices
+        # from whatever generator it was given, so `TransitionDataset(...)`
+        # with no seed means `np.random.default_rng()` and OS entropy on every
+        # discriminator epoch of every iteration.
         pol = TransitionDataset(pol_obs, pol_act, np.zeros(len(pol_obs)), pol_obs,
-                                np.zeros(len(pol_obs)), device=str(self.device))
+                                np.zeros(len(pol_obs)), device=str(self.device),
+                                seed=int(self.rng.integers(2**32)))
         losses = []
         for _ in range(epochs):
             # The expert dataset comes from the caller and is on whatever

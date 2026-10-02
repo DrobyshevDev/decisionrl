@@ -7,6 +7,7 @@ import torch
 from decisionrl.envs import CartPole
 from decisionrl.imitation import BC, GAIL, DAgger, GAILDiscriminator, collect_expert_dataset
 from decisionrl.training import evaluate_policy
+from decisionrl.utils import set_seed
 
 
 def _expert(o):
@@ -126,3 +127,42 @@ def test_bc_trains_when_the_dataset_is_on_another_device(quiet_logger):
     bc = BC(CartPole(), seed=0, logger=quiet_logger)                  # cuda
     assert data.device != bc.device
     bc.train(data, n_iters=3, batch_size=16)
+
+
+def test_gail_is_reproducible_from_its_seed(quiet_logger):
+    """Two GAIL runs at one seed have to give one answer.
+
+    They did not. `seed=` named nothing, for two reasons that `set_seed` cannot
+    reach and its own docstring warns about:
+
+    * the policy rollouts start from `self.env`, and an env owns an
+      `np.random.default_rng()` built without a seed, so every iteration of
+      `learn` drew its starting states from OS entropy;
+    * the policy dataset the discriminator trains against was rebuilt each
+      iteration as `TransitionDataset(...)` with no seed, so its minibatch
+      indices came from OS entropy too, on every discriminator epoch.
+
+    Three fresh processes at seed 0 returned 421.70, 496.20 and 385.10 before
+    this; afterwards they return one number, three times.
+
+    `set_seed` is called per run, which is what conftest does per test, because
+    that is the contract as it stands: an agent's networks are initialised from
+    global torch state rather than from its own `seed`, here and in every other
+    algorithm in this package. So `seed=` currently means "reproducible given
+    the same global state", not "reproducible". Making it mean the second is a
+    change to every agent, not to this one, and is not what this test is for --
+    but without saying so, the `set_seed` below looks like ceremony.
+
+    Short on purpose -- this is about determinism, not about learning, and the
+    full-size run is `test_gail_imitates_expert` above.
+    """
+    def once():
+        set_seed(0)
+        data = collect_expert_dataset(CartPole(), _expert, 2000, seed=0)
+        gail = GAIL(CartPole(), data, n_steps=512, batch_size=64, n_epochs=2, seed=0,
+                    logger=quiet_logger)
+        gail.learn(iterations=2, steps_per_iter=1024, disc_epochs=3, disc_batch=64)
+        return evaluate_policy(gail, CartPole(), n_episodes=10, seed=100)[0]
+
+    first, second = once(), once()
+    assert first == second, f"GAIL(seed=0) gave {first} and then {second}"

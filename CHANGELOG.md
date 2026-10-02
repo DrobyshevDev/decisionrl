@@ -19,6 +19,21 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   the freeze semantics of Stable-Baselines3's `VecNormalize`.
 
 ### Fixed
+- `GRPO(seed=...)` was not reproducible either, and for the first of the same two
+  reasons: `_rollout_episode` resets the env once per episode and never with a seed, so
+  every episode started from OS entropy. `GRPO(seed=0)` returned 91.2 and then 94.7; it
+  now returns one number. Seeded once at the top of `learn`, as `off_policy`, `tabular`
+  and `sac_discrete` already do. An audit of the other algorithms found no third case:
+  every other training loop seeds its first reset, and the unseeded resets that follow
+  draw from a seeded stream.
+- `GAIL(seed=...)` was not reproducible. Two sources, both of them data rather than
+  weights, and both invisible to `set_seed` for the reason its own docstring gives: the
+  policy rollouts start from `self.env`, whose `np.random.default_rng()` is built without
+  a seed, and the policy dataset the discriminator trains against was rebuilt each
+  iteration as `TransitionDataset(...)` with no seed, so its minibatch indices came from
+  OS entropy on every discriminator epoch. Three fresh processes at seed 0 returned
+  421.70, 496.20 and 385.10; they now return one number. This is what made
+  `test_gail_imitates_expert` fail about one run in ten.
 - `BC` and `GAIL` raised on any machine with a GPU. Both take `device="auto"`, which puts
   the network on CUDA when there is one, while `TransitionDataset` defaults to `"cpu"` and
   `collect_expert_dataset` never passes anything else — so the documented way of using them
