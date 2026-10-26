@@ -200,6 +200,15 @@ class GRPO(BaseAgent):
 
     def learn(self, total_steps: int, callback=None, log_interval: int = 1) -> "GRPO":
         self._total_timesteps = self.num_timesteps + total_steps
+        # Seed the env once here, as off_policy, tabular and sac_discrete do at
+        # the top of their own `learn`. `_rollout_episode` resets per episode
+        # without a seed, and an env owns an `np.random.default_rng()` built
+        # without one, so until this line GRPO drew every episode's starting
+        # state from OS entropy: `GRPO(seed=0)` returned 91.2 and then 94.7.
+        # A reset keeps the generator it was handed, so the unseeded resets
+        # that follow draw from a seeded stream.
+        if self.seed is not None:
+            self.env.reset(seed=self.seed)
         if callback is not None:
             callback.on_training_start(self)
         returns_window: deque = deque(maxlen=100)
