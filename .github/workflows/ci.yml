@@ -19,7 +19,9 @@ permissions:
 jobs:
   lint-and-test:
     name: lint + fast tests (py${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    # ubuntu-latest is 26.04, and setup-python has no 3.9 build for it (3.9 is
+    # past end of life). 24.04 still has one, so 3.9 stays tested there.
+    runs-on: ${{ matrix.python-version == '3.9' && 'ubuntu-24.04' || 'ubuntu-latest' }}
     strategy:
       fail-fast: false
       matrix:
