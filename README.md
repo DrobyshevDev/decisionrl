@@ -29,8 +29,8 @@ Reinforcement learning for operational decisions.
 Most reinforcement learning libraries target games and robotics (Atari, MuJoCo,
 control suites). `decisionrl` targets operational decisions: pricing, inventory,
 energy, queueing, and supply chains. Each of these problems ships as a first-class
-environment paired with the classical operations-research baseline, so a learned
-policy can be measured against the standard method rather than asserted to be good.
+environment paired with the classical operations-research baseline, and a learned
+policy is compared with that standard method.
 
 Underneath the applied layer is a dependency-light library of 32 algorithms with a single
 `predict` / `learn` / `save` / `load` interface, static typing, and a test suite that
@@ -360,8 +360,7 @@ Usage for each is documented at
 
 A trained policy exports to ONNX and serves over HTTP behind a small container that needs
 neither PyTorch nor the training package, only onnxruntime and FastAPI. The image is built
-and smoke-tested on every push by the `docker-serve` job in CI, so the deployment path is
-verified, not assumed.
+and smoke-tested on every push by the `docker-serve` job in CI.
 
 ```bash
 docker build -f deploy/Dockerfile -t decisionrl-serve .
